@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Index</title>
+   
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f2f2f2;
+            font-size: 16px;
+            color: #333;
+        }
+
+        header {
+            background: #4158d0;
+            padding: 10px 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 80%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .container span {
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .container a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            margin-left: 20px;
+        }
+
+        .container a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        #search {
+            width: 100%;
+            max-width: 600px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #scroller {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px 0;
+        }
+
+        #categories {
+            list-style: none;
+            padding: 0;
+        }
+
+        #categories li {
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        #results {
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 20px;
+}
+
+#results table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#results table, #results th, #results td {
+    border: 1px solid #ddd;
+}
+
+#results th, #results td {
+    padding: 12px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+#results th {
+    background: #4158d0;
+    color: #fff;
+}
+
+#results tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+#results td {
+    word-break: break-word;
+}
+
+/* Ensuring no gaps and proper alignment */
+#results tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+#results th, #results td {
+    width: 25%; /* Adjust if needed */
+}
+
+
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="container">
+                <span id="username">{{ username }}</span>
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="search-container">
+            <input type="text" id="search" placeholder="Search by name or category" onkeyup="searchUsers()">
+        </div>
+        <div id="scroller">
+            <ul id="categories"></ul>
+        </div>
+        <div id="results"></div>
+    </main>
+
+    <script>
+        function fetchCategories() {
+            fetch('/get-categories/')
+                .then(response => response.json())
+                .then(data => {
+                    const categoryList = document.getElementById('categories');
+                    data.forEach(category => {
+                        const li = document.createElement('li');
+                        li.textContent = category;
+                        categoryList.appendChild(li);
+                    });
+                });
+        }
+        fetchCategories();
+
+        function searchUsers() {
+            const query = document.getElementById('search').value;
+            if (query.length < 2) return;
+            fetch(`/search/?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const results = document.getElementById('results');
+                    results.innerHTML = "<table><tr><th>SL No</th><th>Name</th><th>Phone</th><th>Email</th></tr>";
+                    data.forEach((user, index) => {
+                        results.innerHTML += `<table><tr><td>${index + 1}</td><td>${user.name}</td><td>${user.phone}</td><td>${user.email}</td></tr>`;
+                    });
+                    results.innerHTML += "</table>";
+                });
+        }
+    </script>
+</body>
+</html>
